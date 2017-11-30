@@ -23,4 +23,5 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation project(':ec')
     annotationProcessor project(':lib-compiler')
+    compile project(path: ':core')
 }
