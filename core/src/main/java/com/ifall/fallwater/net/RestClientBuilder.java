@@ -4,6 +4,9 @@ import com.ifall.fallwater.net.callback.IError;
 import com.ifall.fallwater.net.callback.IFailure;
 import com.ifall.fallwater.net.callback.IRequest;
 import com.ifall.fallwater.net.callback.ISuccess;
+import com.ifall.fallwater.ui.LoaderStyle;
+
+import android.content.Context;
 
 import java.util.Map;
 
@@ -35,6 +38,10 @@ public class RestClientBuilder {
 
     private RequestBody mBody;
 
+    private LoaderStyle mLoaderStyle;
+
+    private Context mContext;
+
     public RestClientBuilder() {
     }
 
@@ -48,7 +55,7 @@ public class RestClientBuilder {
         return this;
     }
 
-    public final RestClientBuilder parms(String key, Object value) {
+    public final RestClientBuilder params(String key, Object value) {
         PARAMS.put(key, value);
         return this;
     }
@@ -78,7 +85,20 @@ public class RestClientBuilder {
         return this;
     }
 
+    public final RestClientBuilder loader(LoaderStyle loaderStyle, Context context) {
+        this.mLoaderStyle = loaderStyle;
+        this.mContext = context;
+        return this;
+    }
+
+    public final RestClientBuilder loader(Context context) {
+        this.mLoaderStyle = LoaderStyle.BallSpinFadeLoaderIndicator;
+        this.mContext = context;
+        return this;
+    }
+
     public final RestClient build() {
-        return new RestClient(mUrl, PARAMS, mRequest, mSuccess, mError, mFailure);
+        return new RestClient(mUrl, PARAMS, mRequest, mSuccess, mError, mFailure, mLoaderStyle,
+                mContext);
     }
 }

@@ -59,4 +59,8 @@ public class RestCreator {
                 RetrofitHolder.RETROFIT_CLIENT.create(RestService.class);
     }
 
+    public static RestService getRestService() {
+        return RestServiceHolder.REST_SERVICE;
+    }
+
 }

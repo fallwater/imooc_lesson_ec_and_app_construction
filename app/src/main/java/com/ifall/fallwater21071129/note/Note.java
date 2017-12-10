@@ -1,4 +1,4 @@
-package com.ifall.fallwater.net.callback;
+package com.ifall.fallwater21071129.note;
 
 /**
  * Created by
@@ -9,8 +9,10 @@ package com.ifall.fallwater.net.callback;
  * description:
  */
 
-public interface IError {
+public class Note {
 
-    void onError(int errorCode,String errorMessage);
+    /**
+     * 1.loader加载失败
+     */
 
 }

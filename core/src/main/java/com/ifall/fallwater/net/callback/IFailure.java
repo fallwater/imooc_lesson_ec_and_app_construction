@@ -11,4 +11,6 @@ package com.ifall.fallwater.net.callback;
 
 public interface IFailure {
 
+    void onFailure();
+
 }
