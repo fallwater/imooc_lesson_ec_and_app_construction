@@ -10,8 +10,12 @@ import com.ifall.fallwater.ui.LoaderStyle;
 
 import android.content.Context;
 
+import java.io.File;
 import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -38,20 +42,27 @@ public class RestClient {
 
     private final IFailure FAILURE;
 
-    private final LoaderStyle LOADER_STYTLE;
+    private final RequestBody REQUEST_BODY;
+
+    private final File FILE;
+
+    private final LoaderStyle LOADER_STYLE;
 
     private final Context CONTEXT;
 
     public RestClient(String url, Map<String, Object> params,
             IRequest request, ISuccess success, IError error,
-            IFailure failure, LoaderStyle loaderStyle, Context context) {
+            IFailure failure, RequestBody requestBody,
+            File file, LoaderStyle loaderStyle, Context context) {
         this.URL = url;
         PARAMS.putAll(params);
         this.REQUEST = request;
         this.SUCCESS = success;
         this.ERROR = error;
         this.FAILURE = failure;
-        this.LOADER_STYTLE = loaderStyle;
+        this.REQUEST_BODY = requestBody;
+        this.FILE = file;
+        this.LOADER_STYLE = loaderStyle;
         this.CONTEXT = context;
     }
 
@@ -67,8 +78,8 @@ public class RestClient {
             REQUEST.onRequestStart();
         }
 
-        if (LOADER_STYTLE != null) {
-            LatteLoader.showLoading(CONTEXT, LOADER_STYTLE);
+        if (LOADER_STYLE != null) {
+            LatteLoader.showLoading(CONTEXT, LOADER_STYLE);
         }
 
         switch (method) {
@@ -82,12 +93,18 @@ public class RestClient {
             case DELETE:
                 break;
             case UPLOAD:
+                final RequestBody requestBody = RequestBody
+                        .create(MediaType.parse(MultipartBody.FORM.toString()), FILE);
+                final MultipartBody.Part part = MultipartBody.Part
+                        .createFormData("file", FILE.getName());
                 break;
             case PUT_RAW:
+                call = service.putRaw(URL, REQUEST_BODY);
                 break;
             case DOWNLOAD:
                 break;
             case POST_RAW:
+                call = service.posRaw(URL, REQUEST_BODY);
                 break;
             default:
                 break;
@@ -99,7 +116,7 @@ public class RestClient {
     }
 
     private Callback<String> getRequestCallback() {
-        return new RequestCallback(REQUEST, SUCCESS, ERROR, FAILURE, LOADER_STYTLE);
+        return new RequestCallback(REQUEST, SUCCESS, ERROR, FAILURE, LOADER_STYLE);
     }
 
     public final void get() {
@@ -107,11 +124,21 @@ public class RestClient {
     }
 
     public final void post() {
-        request(HttpMethod.POST);
+        if (REQUEST_BODY == null && PARAMS != null && !PARAMS.isEmpty()) {
+            request(HttpMethod.POST);
+        } else if (REQUEST_BODY != null && (PARAMS == null || PARAMS.isEmpty())) {
+            request(HttpMethod.POST_RAW);
+        } else {
+            throw new RuntimeException("params or requestBody must be have one exist, ");
+        }
     }
 
     public final void put() {
-        request(HttpMethod.PUT);
+        if (REQUEST_BODY == null) {
+            request(HttpMethod.PUT);
+        } else {
+            request(HttpMethod.POST_RAW);
+        }
     }
 
     public final void delete() {

@@ -8,6 +8,7 @@ import com.ifall.fallwater.ui.LoaderStyle;
 
 import android.content.Context;
 
+import java.io.File;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -36,7 +37,9 @@ public class RestClientBuilder {
 
     private IFailure mFailure;
 
-    private RequestBody mBody;
+    private RequestBody mRequestBody;
+
+    private File mFile;
 
     private LoaderStyle mLoaderStyle;
 
@@ -61,7 +64,24 @@ public class RestClientBuilder {
     }
 
     public final RestClientBuilder raw(String raw) {
-        this.mBody = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), raw);
+        this.mRequestBody = RequestBody
+                .create(MediaType.parse("application/json;charset=UTF-8"), raw);
+        return this;
+    }
+
+    public final RestClientBuilder file(File file) {
+        this.mFile = file;
+        return this;
+    }
+
+    public final RestClientBuilder file(String filePath) {
+        this.mFile = new File(filePath);
+        return this;
+    }
+
+
+    public final RestClientBuilder requestBody(RequestBody requestBody) {
+        this.mRequestBody = requestBody;
         return this;
     }
 
@@ -98,7 +118,7 @@ public class RestClientBuilder {
     }
 
     public final RestClient build() {
-        return new RestClient(mUrl, PARAMS, mRequest, mSuccess, mError, mFailure, mLoaderStyle,
-                mContext);
+        return new RestClient(mUrl, PARAMS, mRequest, mSuccess, mError, mFailure, mRequestBody,
+                mFile, mLoaderStyle, mContext);
     }
 }
